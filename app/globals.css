@@ -1,11 +1,75 @@
 @import "tailwindcss";
 
+/* Registered so the theme can tween smoothly between light and dark sections. */
+@property --bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f2f1ec;
+}
+@property --fg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0e0e0d;
+}
+@property --muted {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #74736d;
+}
+@property --line {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: rgb(14 14 13 / 0.12);
+}
+
+:root {
+  --bg: #f2f1ec;
+  --fg: #0e0e0d;
+  --muted: #74736d;
+  --line: rgb(14 14 13 / 0.12);
+  --accent: #1fc85a;
+  --ink: #0c0c0b;
+  --paper: #efeee9;
+
+  transition:
+    --bg 0.9s cubic-bezier(0.65, 0, 0.35, 1),
+    --fg 0.9s cubic-bezier(0.65, 0, 0.35, 1),
+    --muted 0.9s cubic-bezier(0.65, 0, 0.35, 1),
+    --line 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+:root[data-theme="dark"] {
+  --bg: #0c0c0b;
+  --fg: #efeee9;
+  --muted: #8b8a84;
+  --line: rgb(239 238 233 / 0.14);
+}
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --font-sans: var(--font-supreme), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-supreme: var(--font-supreme);
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 *,
@@ -16,4 +80,92 @@
 
 *:active {
   cursor: url("/cursor-active.png") 5 2, auto;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+/* ----- Lenis ----- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* ----- Film grain ----- */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation: grain 1.2s steps(6) infinite;
+}
+
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-4%, 3%); }
+  40% { transform: translate(3%, -5%); }
+  60% { transform: translate(-6%, -2%); }
+  80% { transform: translate(5%, 6%); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes scrollcue {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+
+/* ----- Small utilities ----- */
+.label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.pulse-dot {
+  position: relative;
+}
+.pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: inherit;
+  animation: pulse 2s cubic-bezier(0.2, 0.6, 0.35, 1) infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 100% 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.link-underline:hover,
+.link-underline:focus-visible {
+  background-size: 100% 1px;
+  background-position: 0% 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain,
+  .pulse-dot::after {
+    animation: none;
+  }
+  :root {
+    transition: none;
+  }
 }
